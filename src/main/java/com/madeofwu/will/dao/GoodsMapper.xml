@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.madeofwu.will.dao.GoodsMapper" >
+<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+  <resultMap id="BaseResultMap" type="com.madeofwu.will.pojo.Goods" >
+    <id column="goods_Id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="goods_unit" property="goodsUnit" jdbcType="VARCHAR" />
+    <result column="goods_type" property="goodsType" jdbcType="VARCHAR" />
+    <result column="goods_color" property="goodsColor" jdbcType="VARCHAR" />
+    <result column="goods_store" property="goodsStore" jdbcType="INTEGER" />
+    <result column="goods_producer" property="goodsProducer" jdbcType="VARCHAR" />
+    <result column="goods_remark" property="goodsRemark" jdbcType="VARCHAR" />
+    <result column="goods_sel_price" property="goodsSelPrice" jdbcType="INTEGER" />
+    <result column="goods_buy_price" property="goodsBuyPrice" jdbcType="INTEGER" />
+    <result column="goods_store_id" property="goodsStoreId" jdbcType="INTEGER" />
+    <result column="goods_supplier_id" property="goodsSupplierId" jdbcType="INTEGER" />
+    <result column="goods_created" property="goodsCreated" jdbcType="VARCHAR" />
+    <result column="goods_updated" property="goodsUpdated" jdbcType="VARCHAR" />
+  </resultMap>
+   <resultMap type="com.madeofwu.will.pojo.Goods" id="WithSupAndShResultMap">
+  	 <id column="goods_Id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="goods_unit" property="goodsUnit" jdbcType="VARCHAR" />
+    <result column="goods_type" property="goodsType" jdbcType="VARCHAR" />
+    <result column="goods_color" property="goodsColor" jdbcType="VARCHAR" />
+    <result column="goods_store" property="goodsStore" jdbcType="INTEGER" />
+    <result column="goods_producer" property="goodsProducer" jdbcType="VARCHAR" />
+    <result column="goods_remark" property="goodsRemark" jdbcType="VARCHAR" />
+    <result column="goods_sel_price" property="goodsSelPrice" jdbcType="INTEGER" />
+    <result column="goods_buy_price" property="goodsBuyPrice" jdbcType="INTEGER" />
+    <result column="goods_store_id" property="goodsStoreId" jdbcType="INTEGER" />
+    <result column="goods_supplier_id" property="goodsSupplierId" jdbcType="INTEGER" />
+    <result column="goods_created" property="goodsCreated" jdbcType="VARCHAR" />
+    <result column="goods_updated" property="goodsUpdated" jdbcType="VARCHAR" />
+    <!-- 指定联合查询出的部门字段的封装 -->
+    <association property="storeHouse" javaType="com.madeofwu.will.pojo.StoreHouse">
+    	<id column="sh_id" property="shId" jdbcType="INTEGER" />
+    <result column="sh_name" property="shName" jdbcType="VARCHAR" />
+    
+    </association>
+     <association property="supplier" javaType="com.madeofwu.will.pojo.Supplier">
+    	 <id column="sup_id" property="supId" jdbcType="INTEGER" />
+    <result column="sup_name" property="supName" jdbcType="VARCHAR" />
+   
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    goods_Id, goods_name, goods_unit, goods_type, goods_color, goods_store, goods_producer, 
+    goods_remark, goods_sel_price, goods_buy_price, goods_store_id, goods_supplier_id, 
+    goods_created, goods_updated
+  </sql>
+   <sql id="WithSupAndSh_Column_List">
+    g.goods_Id, g.goods_name, g.goods_unit, g.goods_type, g.goods_color, g.goods_store, g.goods_producer, 
+    g.goods_remark, g.goods_sel_price, g.goods_buy_price, g.goods_store_id, g.goods_supplier_id, 
+    g.goods_created, g.goods_updated,
+    e.sh_id, e.sh_name, 
+    r.sup_id, r.sup_name
+  </sql>
+  
+   <!-- 查询商品同时带供应商和仓库信息 -->
+  <select id="selectByExampleWithSupAndSh" resultMap="WithSupAndShResultMap">
+	   select
+	    <if test="distinct">
+	      distinct
+	    </if>
+	    <include refid="WithSupAndSh_Column_List" />
+		FROM goods g
+		left join supplier r on g.`goods_supplier_id`=r.`sup_id` 
+		left join store_house e on g.`goods_store_id`=e.`sh_id`
+	    <if test="_parameter != null">
+	      <include refid="Example_Where_Clause" />
+	    </if>
+	    <if test="orderByClause != null">
+	      order by ${orderByClause}
+	    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithSupAndSh" resultMap="WithSupAndShResultMap">
+   	select 
+    <include refid="WithSupAndSh_Column_List" />
+    FROM goods g
+	left join supplier r on g.`goods_supplier_id`=r.`sup_id` 
+    left join store_house e on g.`goods_store_id`=e.`sh_id`
+    where goods_Id = #{goodsId,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 查询商品不带部门信息的 -->
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.madeofwu.will.pojo.GoodsExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from goods
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods
+    where goods_Id = #{goodsId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from goods
+    where goods_Id = #{goodsId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.madeofwu.will.pojo.GoodsExample" >
+    delete from goods
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.madeofwu.will.pojo.Goods" >
+    insert into goods (goods_Id, goods_name, goods_unit, 
+      goods_type, goods_color, goods_store, 
+      goods_producer, goods_remark, goods_sel_price, 
+      goods_buy_price, goods_store_id, goods_supplier_id, 
+      goods_created, goods_updated)
+    values (#{goodsId,jdbcType=VARCHAR}, #{goodsName,jdbcType=VARCHAR}, #{goodsUnit,jdbcType=VARCHAR}, 
+      #{goodsType,jdbcType=VARCHAR}, #{goodsColor,jdbcType=VARCHAR}, #{goodsStore,jdbcType=INTEGER}, 
+      #{goodsProducer,jdbcType=VARCHAR}, #{goodsRemark,jdbcType=VARCHAR}, #{goodsSelPrice,jdbcType=INTEGER}, 
+      #{goodsBuyPrice,jdbcType=INTEGER}, #{goodsStoreId,jdbcType=INTEGER}, #{goodsSupplierId,jdbcType=INTEGER}, 
+      #{goodsCreated,jdbcType=VARCHAR}, #{goodsUpdated,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.madeofwu.will.pojo.Goods" >
+    insert into goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodsId != null" >
+        goods_Id,
+      </if>
+      <if test="goodsName != null" >
+        goods_name,
+      </if>
+      <if test="goodsUnit != null" >
+        goods_unit,
+      </if>
+      <if test="goodsType != null" >
+        goods_type,
+      </if>
+      <if test="goodsColor != null" >
+        goods_color,
+      </if>
+      <if test="goodsStore != null" >
+        goods_store,
+      </if>
+      <if test="goodsProducer != null" >
+        goods_producer,
+      </if>
+      <if test="goodsRemark != null" >
+        goods_remark,
+      </if>
+      <if test="goodsSelPrice != null" >
+        goods_sel_price,
+      </if>
+      <if test="goodsBuyPrice != null" >
+        goods_buy_price,
+      </if>
+      <if test="goodsStoreId != null" >
+        goods_store_id,
+      </if>
+      <if test="goodsSupplierId != null" >
+        goods_supplier_id,
+      </if>
+      <if test="goodsCreated != null" >
+        goods_created,
+      </if>
+      <if test="goodsUpdated != null" >
+        goods_updated,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsName != null" >
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsUnit != null" >
+        #{goodsUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsType != null" >
+        #{goodsType,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsColor != null" >
+        #{goodsColor,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsStore != null" >
+        #{goodsStore,jdbcType=INTEGER},
+      </if>
+      <if test="goodsProducer != null" >
+        #{goodsProducer,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsRemark != null" >
+        #{goodsRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsSelPrice != null" >
+        #{goodsSelPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsBuyPrice != null" >
+        #{goodsBuyPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsStoreId != null" >
+        #{goodsStoreId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsSupplierId != null" >
+        #{goodsSupplierId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsCreated != null" >
+        #{goodsCreated,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsUpdated != null" >
+        #{goodsUpdated,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.madeofwu.will.pojo.GoodsExample" resultType="java.lang.Integer" >
+    select count(*) from goods
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update goods
+    <set >
+      <if test="record.goodsId != null" >
+        goods_Id = #{record.goodsId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsName != null" >
+        goods_name = #{record.goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsUnit != null" >
+        goods_unit = #{record.goodsUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsType != null" >
+        goods_type = #{record.goodsType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsColor != null" >
+        goods_color = #{record.goodsColor,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsStore != null" >
+        goods_store = #{record.goodsStore,jdbcType=INTEGER},
+      </if>
+      <if test="record.goodsProducer != null" >
+        goods_producer = #{record.goodsProducer,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsRemark != null" >
+        goods_remark = #{record.goodsRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsSelPrice != null" >
+        goods_sel_price = #{record.goodsSelPrice,jdbcType=INTEGER},
+      </if>
+      <if test="record.goodsBuyPrice != null" >
+        goods_buy_price = #{record.goodsBuyPrice,jdbcType=INTEGER},
+      </if>
+      <if test="record.goodsStoreId != null" >
+        goods_store_id = #{record.goodsStoreId,jdbcType=INTEGER},
+      </if>
+      <if test="record.goodsSupplierId != null" >
+        goods_supplier_id = #{record.goodsSupplierId,jdbcType=INTEGER},
+      </if>
+      <if test="record.goodsCreated != null" >
+        goods_created = #{record.goodsCreated,jdbcType=VARCHAR},
+      </if>
+      <if test="record.goodsUpdated != null" >
+        goods_updated = #{record.goodsUpdated,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update goods
+    set goods_Id = #{record.goodsId,jdbcType=VARCHAR},
+      goods_name = #{record.goodsName,jdbcType=VARCHAR},
+      goods_unit = #{record.goodsUnit,jdbcType=VARCHAR},
+      goods_type = #{record.goodsType,jdbcType=VARCHAR},
+      goods_color = #{record.goodsColor,jdbcType=VARCHAR},
+      goods_store = #{record.goodsStore,jdbcType=INTEGER},
+      goods_producer = #{record.goodsProducer,jdbcType=VARCHAR},
+      goods_remark = #{record.goodsRemark,jdbcType=VARCHAR},
+      goods_sel_price = #{record.goodsSelPrice,jdbcType=INTEGER},
+      goods_buy_price = #{record.goodsBuyPrice,jdbcType=INTEGER},
+      goods_store_id = #{record.goodsStoreId,jdbcType=INTEGER},
+      goods_supplier_id = #{record.goodsSupplierId,jdbcType=INTEGER},
+      goods_created = #{record.goodsCreated,jdbcType=VARCHAR},
+      goods_updated = #{record.goodsUpdated,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.madeofwu.will.pojo.Goods" >
+    update goods
+    <set >
+      <if test="goodsName != null" >
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsUnit != null" >
+        goods_unit = #{goodsUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsType != null" >
+        goods_type = #{goodsType,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsColor != null" >
+        goods_color = #{goodsColor,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsStore != null" >
+        goods_store = #{goodsStore,jdbcType=INTEGER},
+      </if>
+      <if test="goodsProducer != null" >
+        goods_producer = #{goodsProducer,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsRemark != null" >
+        goods_remark = #{goodsRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsSelPrice != null" >
+        goods_sel_price = #{goodsSelPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsBuyPrice != null" >
+        goods_buy_price = #{goodsBuyPrice,jdbcType=INTEGER},
+      </if>
+      <if test="goodsStoreId != null" >
+        goods_store_id = #{goodsStoreId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsSupplierId != null" >
+        goods_supplier_id = #{goodsSupplierId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsCreated != null" >
+        goods_created = #{goodsCreated,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsUpdated != null" >
+        goods_updated = #{goodsUpdated,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where goods_Id = #{goodsId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.madeofwu.will.pojo.Goods" >
+    update goods
+    set goods_name = #{goodsName,jdbcType=VARCHAR},
+      goods_unit = #{goodsUnit,jdbcType=VARCHAR},
+      goods_type = #{goodsType,jdbcType=VARCHAR},
+      goods_color = #{goodsColor,jdbcType=VARCHAR},
+      goods_store = #{goodsStore,jdbcType=INTEGER},
+      goods_producer = #{goodsProducer,jdbcType=VARCHAR},
+      goods_remark = #{goodsRemark,jdbcType=VARCHAR},
+      goods_sel_price = #{goodsSelPrice,jdbcType=INTEGER},
+      goods_buy_price = #{goodsBuyPrice,jdbcType=INTEGER},
+      goods_store_id = #{goodsStoreId,jdbcType=INTEGER},
+      goods_supplier_id = #{goodsSupplierId,jdbcType=INTEGER},
+      goods_created = #{goodsCreated,jdbcType=VARCHAR},
+      goods_updated = #{goodsUpdated,jdbcType=VARCHAR}
+    where goods_Id = #{goodsId,jdbcType=VARCHAR}
+  </update>
+</mapper>

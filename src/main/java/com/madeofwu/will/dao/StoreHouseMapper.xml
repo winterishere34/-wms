@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.madeofwu.will.dao.StoreHouseMapper" >
+<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+  <resultMap id="BaseResultMap" type="com.madeofwu.will.pojo.StoreHouse" >
+    <id column="sh_id" property="shId" jdbcType="INTEGER" />
+    <result column="sh_name" property="shName" jdbcType="VARCHAR" />
+    <result column="sh_responsible" property="shResponsible" jdbcType="VARCHAR" />
+    <result column="sh_phone" property="shPhone" jdbcType="VARCHAR" />
+    <result column="sh_address" property="shAddress" jdbcType="VARCHAR" />
+    <result column="sh_type" property="shType" jdbcType="INTEGER" />
+    <result column="sh_remark" property="shRemark" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap type="com.madeofwu.will.pojo.StoreHouse" id="WithTypeResultMap">
+  	 <id column="sh_id" property="shId" jdbcType="INTEGER" />
+    <result column="sh_name" property="shName" jdbcType="VARCHAR" />
+    <result column="sh_responsible" property="shResponsible" jdbcType="VARCHAR" />
+    <result column="sh_phone" property="shPhone" jdbcType="VARCHAR" />
+    <result column="sh_address" property="shAddress" jdbcType="VARCHAR" />
+    <result column="sh_type" property="shType" jdbcType="INTEGER" />
+    <result column="sh_remark" property="shRemark" jdbcType="VARCHAR" />
+    <!-- 指定联合查询出的部门字段的封装 -->
+    <association property="storeHouseType" javaType="com.madeofwu.will.pojo.StoreHouseType">
+    	 <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="store_house_typename" property="storeHouseTypename" jdbcType="VARCHAR" />
+    </association>
+     
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    sh_id, sh_name, sh_responsible, sh_phone, sh_address, sh_type, sh_remark
+  </sql>
+  <sql id="WithType_Column_List">
+  	s.sh_id, s.sh_name, s.sh_responsible, s.sh_phone, s.sh_address, s.sh_type, s.sh_remark,
+  	t.id, t.store_house_typename
+  </sql>
+   <!-- 查询仓库同时带状态信息 -->
+  <select id="selectByExampleWithType" resultMap="WithTypeResultMap">
+	   select
+	    <if test="distinct">
+	      distinct
+	    </if>
+	    <include refid="WithType_Column_List" />
+		FROM store_house s
+		left join store_house_type t on s.`sh_type`=t.`id` 
+	    <if test="_parameter != null">
+	      <include refid="Example_Where_Clause" />
+	    </if>
+	    <if test="orderByClause != null">
+	      order by ${orderByClause}
+	    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithType" resultMap="WithTypeResultMap">
+   	select 
+    <include refid="WithType_Column_List" />
+    FROM store_house s
+	left join store_house_type t on s.`sh_type`=t.`id`
+    where sh_id = #{shId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 查询仓库不带状态信息的 -->
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.madeofwu.will.pojo.StoreHouseExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from store_house
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from store_house
+    where sh_id = #{shId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from store_house
+    where sh_id = #{shId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.madeofwu.will.pojo.StoreHouseExample" >
+    delete from store_house
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.madeofwu.will.pojo.StoreHouse" >
+    insert into store_house (sh_id, sh_name, sh_responsible, 
+      sh_phone, sh_address, sh_type, 
+      sh_remark)
+    values (#{shId,jdbcType=INTEGER}, #{shName,jdbcType=VARCHAR}, #{shResponsible,jdbcType=VARCHAR}, 
+      #{shPhone,jdbcType=VARCHAR}, #{shAddress,jdbcType=VARCHAR}, #{shType,jdbcType=INTEGER}, 
+      #{shRemark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.madeofwu.will.pojo.StoreHouse" >
+    insert into store_house
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="shId != null" >
+        sh_id,
+      </if>
+      <if test="shName != null" >
+        sh_name,
+      </if>
+      <if test="shResponsible != null" >
+        sh_responsible,
+      </if>
+      <if test="shPhone != null" >
+        sh_phone,
+      </if>
+      <if test="shAddress != null" >
+        sh_address,
+      </if>
+      <if test="shType != null" >
+        sh_type,
+      </if>
+      <if test="shRemark != null" >
+        sh_remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="shId != null" >
+        #{shId,jdbcType=INTEGER},
+      </if>
+      <if test="shName != null" >
+        #{shName,jdbcType=VARCHAR},
+      </if>
+      <if test="shResponsible != null" >
+        #{shResponsible,jdbcType=VARCHAR},
+      </if>
+      <if test="shPhone != null" >
+        #{shPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="shAddress != null" >
+        #{shAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="shType != null" >
+        #{shType,jdbcType=INTEGER},
+      </if>
+      <if test="shRemark != null" >
+        #{shRemark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.madeofwu.will.pojo.StoreHouseExample" resultType="java.lang.Integer" >
+    select count(*) from store_house
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update store_house
+    <set >
+      <if test="record.shId != null" >
+        sh_id = #{record.shId,jdbcType=INTEGER},
+      </if>
+      <if test="record.shName != null" >
+        sh_name = #{record.shName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shResponsible != null" >
+        sh_responsible = #{record.shResponsible,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shPhone != null" >
+        sh_phone = #{record.shPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shAddress != null" >
+        sh_address = #{record.shAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shType != null" >
+        sh_type = #{record.shType,jdbcType=INTEGER},
+      </if>
+      <if test="record.shRemark != null" >
+        sh_remark = #{record.shRemark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update store_house
+    set sh_id = #{record.shId,jdbcType=INTEGER},
+      sh_name = #{record.shName,jdbcType=VARCHAR},
+      sh_responsible = #{record.shResponsible,jdbcType=VARCHAR},
+      sh_phone = #{record.shPhone,jdbcType=VARCHAR},
+      sh_address = #{record.shAddress,jdbcType=VARCHAR},
+      sh_type = #{record.shType,jdbcType=INTEGER},
+      sh_remark = #{record.shRemark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.madeofwu.will.pojo.StoreHouse" >
+    update store_house
+    <set >
+      <if test="shName != null" >
+        sh_name = #{shName,jdbcType=VARCHAR},
+      </if>
+      <if test="shResponsible != null" >
+        sh_responsible = #{shResponsible,jdbcType=VARCHAR},
+      </if>
+      <if test="shPhone != null" >
+        sh_phone = #{shPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="shAddress != null" >
+        sh_address = #{shAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="shType != null" >
+        sh_type = #{shType,jdbcType=INTEGER},
+      </if>
+      <if test="shRemark != null" >
+        sh_remark = #{shRemark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where sh_id = #{shId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.madeofwu.will.pojo.StoreHouse" >
+    update store_house
+    set sh_name = #{shName,jdbcType=VARCHAR},
+      sh_responsible = #{shResponsible,jdbcType=VARCHAR},
+      sh_phone = #{shPhone,jdbcType=VARCHAR},
+      sh_address = #{shAddress,jdbcType=VARCHAR},
+      sh_type = #{shType,jdbcType=INTEGER},
+      sh_remark = #{shRemark,jdbcType=VARCHAR}
+    where sh_id = #{shId,jdbcType=INTEGER}
+  </update>
+</mapper>

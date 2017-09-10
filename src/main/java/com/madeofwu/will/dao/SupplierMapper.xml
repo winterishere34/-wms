@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.madeofwu.will.dao.SupplierMapper" >
+<cache type="org.mybatis.caches.ehcache.EhcacheCache" /> 
+  <resultMap id="BaseResultMap" type="com.madeofwu.will.pojo.Supplier" >
+    <id column="sup_id" property="supId" jdbcType="INTEGER" />
+    <result column="sup_name" property="supName" jdbcType="VARCHAR" />
+    <result column="sup_linkman" property="supLinkman" jdbcType="VARCHAR" />
+    <result column="sup_phone" property="supPhone" jdbcType="VARCHAR" />
+    <result column="sup_address" property="supAddress" jdbcType="VARCHAR" />
+    <result column="sup_remark" property="supRemark" jdbcType="VARCHAR" />
+    <result column="sup_pay" property="supPay" jdbcType="DECIMAL" />
+    <result column="sup_type" property="supType" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap type="com.madeofwu.will.pojo.Supplier" id="WithTypeResultMap">
+  	<id column="sup_id" property="supId" jdbcType="INTEGER" />
+    <result column="sup_name" property="supName" jdbcType="VARCHAR" />
+    <result column="sup_linkman" property="supLinkman" jdbcType="VARCHAR" />
+    <result column="sup_phone" property="supPhone" jdbcType="VARCHAR" />
+    <result column="sup_address" property="supAddress" jdbcType="VARCHAR" />
+    <result column="sup_remark" property="supRemark" jdbcType="VARCHAR" />
+    <result column="sup_pay" property="supPay" jdbcType="DECIMAL" />
+    <result column="sup_type" property="supType" jdbcType="INTEGER" />
+    <!-- 指定联合查询出的部门字段的封装 -->
+    <association property="supplierType" javaType="com.madeofwu.will.pojo.SupplierType">
+    	<id column="id" property="id" jdbcType="INTEGER" />
+    <result column="supplier_typename" property="supplierTypename" jdbcType="VARCHAR" />
+    </association>
+     
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    sup_id, sup_name, sup_linkman, sup_phone, sup_address, sup_remark, sup_pay, sup_type
+  </sql>
+  
+  <sql id="WithType_Column_List">
+  	s.sup_id, s.sup_name, s.sup_linkman, s.sup_phone, s.sup_address, s.sup_remark, s.sup_pay, s.sup_type,
+  	t.id, t.supplier_typename
+  </sql>
+   <!-- 查询供应商同时带状态信息 -->
+  <select id="selectByExampleWithType" resultMap="WithTypeResultMap">
+	   select
+	    <if test="distinct">
+	      distinct
+	    </if>
+	    <include refid="WithType_Column_List" />
+		FROM supplier s
+		left join supplier_type t on s.`sup_type`=t.`id` 
+	    <if test="_parameter != null">
+	      <include refid="Example_Where_Clause" />
+	    </if>
+	    <if test="orderByClause != null">
+	      order by ${orderByClause}
+	    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithType" resultMap="WithTypeResultMap">
+   	select 
+    <include refid="WithType_Column_List" />
+    FROM supplier s
+	left join supplier_type t on s.`sup_type`=t.`id`
+    where sup_id = #{supId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 查询供应商不带状态信息的 -->
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.madeofwu.will.pojo.SupplierExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from supplier
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from supplier
+    where sup_id = #{supId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from supplier
+    where sup_id = #{supId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.madeofwu.will.pojo.SupplierExample" >
+    delete from supplier
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.madeofwu.will.pojo.Supplier" >
+    insert into supplier (sup_id, sup_name, sup_linkman, 
+      sup_phone, sup_address, sup_remark, 
+      sup_pay, sup_type)
+    values (#{supId,jdbcType=INTEGER}, #{supName,jdbcType=VARCHAR}, #{supLinkman,jdbcType=VARCHAR}, 
+      #{supPhone,jdbcType=VARCHAR}, #{supAddress,jdbcType=VARCHAR}, #{supRemark,jdbcType=VARCHAR}, 
+      #{supPay,jdbcType=DECIMAL}, #{supType,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.madeofwu.will.pojo.Supplier" >
+    insert into supplier
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="supId != null" >
+        sup_id,
+      </if>
+      <if test="supName != null" >
+        sup_name,
+      </if>
+      <if test="supLinkman != null" >
+        sup_linkman,
+      </if>
+      <if test="supPhone != null" >
+        sup_phone,
+      </if>
+      <if test="supAddress != null" >
+        sup_address,
+      </if>
+      <if test="supRemark != null" >
+        sup_remark,
+      </if>
+      <if test="supPay != null" >
+        sup_pay,
+      </if>
+      <if test="supType != null" >
+        sup_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="supId != null" >
+        #{supId,jdbcType=INTEGER},
+      </if>
+      <if test="supName != null" >
+        #{supName,jdbcType=VARCHAR},
+      </if>
+      <if test="supLinkman != null" >
+        #{supLinkman,jdbcType=VARCHAR},
+      </if>
+      <if test="supPhone != null" >
+        #{supPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="supAddress != null" >
+        #{supAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="supRemark != null" >
+        #{supRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="supPay != null" >
+        #{supPay,jdbcType=DECIMAL},
+      </if>
+      <if test="supType != null" >
+        #{supType,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.madeofwu.will.pojo.SupplierExample" resultType="java.lang.Integer" >
+    select count(*) from supplier
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update supplier
+    <set >
+      <if test="record.supId != null" >
+        sup_id = #{record.supId,jdbcType=INTEGER},
+      </if>
+      <if test="record.supName != null" >
+        sup_name = #{record.supName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supLinkman != null" >
+        sup_linkman = #{record.supLinkman,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supPhone != null" >
+        sup_phone = #{record.supPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supAddress != null" >
+        sup_address = #{record.supAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supRemark != null" >
+        sup_remark = #{record.supRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supPay != null" >
+        sup_pay = #{record.supPay,jdbcType=DECIMAL},
+      </if>
+      <if test="record.supType != null" >
+        sup_type = #{record.supType,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update supplier
+    set sup_id = #{record.supId,jdbcType=INTEGER},
+      sup_name = #{record.supName,jdbcType=VARCHAR},
+      sup_linkman = #{record.supLinkman,jdbcType=VARCHAR},
+      sup_phone = #{record.supPhone,jdbcType=VARCHAR},
+      sup_address = #{record.supAddress,jdbcType=VARCHAR},
+      sup_remark = #{record.supRemark,jdbcType=VARCHAR},
+      sup_pay = #{record.supPay,jdbcType=DECIMAL},
+      sup_type = #{record.supType,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.madeofwu.will.pojo.Supplier" >
+    update supplier
+    <set >
+      <if test="supName != null" >
+        sup_name = #{supName,jdbcType=VARCHAR},
+      </if>
+      <if test="supLinkman != null" >
+        sup_linkman = #{supLinkman,jdbcType=VARCHAR},
+      </if>
+      <if test="supPhone != null" >
+        sup_phone = #{supPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="supAddress != null" >
+        sup_address = #{supAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="supRemark != null" >
+        sup_remark = #{supRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="supPay != null" >
+        sup_pay = #{supPay,jdbcType=DECIMAL},
+      </if>
+      <if test="supType != null" >
+        sup_type = #{supType,jdbcType=INTEGER},
+      </if>
+    </set>
+    where sup_id = #{supId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.madeofwu.will.pojo.Supplier" >
+    update supplier
+    set sup_name = #{supName,jdbcType=VARCHAR},
+      sup_linkman = #{supLinkman,jdbcType=VARCHAR},
+      sup_phone = #{supPhone,jdbcType=VARCHAR},
+      sup_address = #{supAddress,jdbcType=VARCHAR},
+      sup_remark = #{supRemark,jdbcType=VARCHAR},
+      sup_pay = #{supPay,jdbcType=DECIMAL},
+      sup_type = #{supType,jdbcType=INTEGER}
+    where sup_id = #{supId,jdbcType=INTEGER}
+  </update>
+</mapper>
