@@ -139,5 +139,24 @@ public class AccountRecordsController {
 		PageInfo page = new PageInfo(accountRecords,1);
 		return Msg.success().add("pageInfo", page);
 	}
-
+	
+	@ResponseBody
+	@RequestMapping(value = "/a12313123131312312313123123", method = RequestMethod.DELETE)
+	public Msg deleteAcco23131231313132123ords(@PathVariable("ids") String ids) {
+		// 批量删除
+		if (ids.contains(",")) {
+			List<String> del_ids = new ArrayList<>();
+			String[] str_ids = ids.split(",");
+			// 组装id的集合
+			for (String string : str_ids) {
+				del_ids.add(string);
+			}
+			accountRecordsService.deleteBatch(del_ids);
+		} else {
+			String id = ids;
+			accountRecordsService.delete(id);
+		}
+		return Msg.success();
+	}
+	
 }
