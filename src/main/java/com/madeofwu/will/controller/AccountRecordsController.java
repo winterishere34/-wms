@@ -159,4 +159,14 @@ public class AccountRecordsController {
 		return Msg.success();
 	}
 	
+	@RequestMapping(value = "/accountRecords/ar/s", method = RequestMethod.GET)
+	@ResponseBody
+	public Msg getOneDetailssssss(@PathVariable("arId") String arId,
+			@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
+		PageHelper.startPage(pn, 1);
+		List<AccountRecords> accountRecords=accountRecordsService.getAccountRecords(arId);
+		PageInfo page = new PageInfo(accountRecords,1);
+		return Msg.success().add("pageInfo", page);
+	}
+
 }
